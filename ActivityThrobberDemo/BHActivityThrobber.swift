@@ -11,7 +11,7 @@ import UIKit
 class BHActivityThrobber: UIView {
 
     var parentVC:UIView?
-    var blurView:UIVisualEffectView?
+    var blurView:UIVisualEffectView!
     var container:UIView?
     let throbberRects = NSMutableArray()
     var fillColor:UIColor?
@@ -23,6 +23,7 @@ class BHActivityThrobber: UIView {
     var throbber0extendedFrame:CGRect?
     var throbber1extendedFrame:CGRect?
     var throbber2extendedFrame:CGRect?
+    var stop = false
     
     // Only override drawRect: if you perform custom drawing.
     // An empty implementation adversely affects performance during animation.
@@ -34,7 +35,7 @@ class BHActivityThrobber: UIView {
     func startAnimation() {
         // blur things out
         let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
-        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView = UIVisualEffectView(effect: blurEffect)
         blurView.frame = parentVC!.frame
         parentVC?.addSubview(blurView)
         // the throbber container
@@ -86,11 +87,7 @@ class BHActivityThrobber: UIView {
     }
     
     func stopAnimation() {
-        for square in throbberRects {
-            square.removeFromSuperview()
-        }
-        container?.removeFromSuperview()
-        blurView?.removeFromSuperview()
+        self.stop = true
     }
     
     func setFillColor(red:CGFloat, green:CGFloat, blue:CGFloat) {
@@ -113,7 +110,19 @@ extension BHActivityThrobber {
             curThrobber.frame = grow
             prevThrobber.frame = shrink
             }) { (bool) -> Void in
-                self.startThrobbing(ind + 1)
+                if(self.stop == false) {
+                    self.startThrobbing(ind + 1)
+                }
+                else {
+                    for square in self.throbberRects {
+                        square.removeFromSuperview()
+                    }
+                    self.container?.removeFromSuperview()
+                    NSLog("removing blur")
+                    self.blurView?.removeFromSuperview()
+                    NSLog("blur removed")
+                    self.stop = false
+                }
         }
         
     }
