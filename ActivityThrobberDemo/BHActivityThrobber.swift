@@ -15,6 +15,8 @@ class BHActivityThrobber: UIView {
     var container:UIView?
     let throbberRects = NSMutableArray()
     var fillColor:UIColor?
+    let collapsedFrames = NSMutableArray()
+    let extendedFrames = NSMutableArray()
     var throbber0collapsedFrame:CGRect?
     var throbber1collapsedFrame:CGRect?
     var throbber2collapsedFrame:CGRect?
@@ -47,6 +49,8 @@ class BHActivityThrobber: UIView {
         let borderUIColor = parentVC?.backgroundColor?.CGColor
         throbber0collapsedFrame = CGRect(x: 5.0, y: 20.0, width: 10.0, height: 10.0)
         throbber0extendedFrame = CGRect(x: 5.0, y: 5.0, width: 10.0, height: 40.0)
+        collapsedFrames.addObject(NSValue(CGRect: throbber0collapsedFrame!))
+        extendedFrames.addObject(NSValue(CGRect: throbber0extendedFrame!))
         let rect0 = UIImageView(frame: throbber0collapsedFrame!)
         rect0.layer.borderWidth = 1.0
         rect0.layer.borderColor = borderUIColor
@@ -55,6 +59,8 @@ class BHActivityThrobber: UIView {
         throbberRects.addObject(rect0)
         throbber1collapsedFrame = CGRect(x: 20.0, y: 20.0, width: 10.0, height: 10.0)
         throbber1extendedFrame = CGRect(x: 20.0, y: 5.0, width: 10.0, height: 40.0)
+        collapsedFrames.addObject(NSValue(CGRect: throbber1collapsedFrame!))
+        extendedFrames.addObject(NSValue(CGRect: throbber1extendedFrame!))
         let rect1 = UIImageView(frame: throbber1collapsedFrame!)
         rect1.layer.borderWidth = 1.0
         rect1.layer.borderColor = borderUIColor
@@ -63,6 +69,8 @@ class BHActivityThrobber: UIView {
         throbberRects.addObject(rect1)
         throbber2collapsedFrame = CGRect(x: 35.0, y: 20.0, width: 10.0, height: 10.0)
         throbber2extendedFrame = CGRect(x: 35.0, y: 5.0, width: 10.0, height: 40.0)
+        collapsedFrames.addObject(NSValue(CGRect: throbber2collapsedFrame!))
+        extendedFrames.addObject(NSValue(CGRect: throbber2extendedFrame!))
         let rect2 = UIImageView(frame: throbber2collapsedFrame!)
         rect2.layer.borderWidth = 1.0
         rect2.layer.borderColor = borderUIColor
@@ -73,7 +81,7 @@ class BHActivityThrobber: UIView {
         container?.addSubview(rect1)
         container?.addSubview(rect2)
         parentVC?.addSubview(container!)
-        startThrobbing()
+        startThrobbing(1)
         
     }
     
@@ -94,24 +102,19 @@ class BHActivityThrobber: UIView {
 
 // #MARK - Private Functions
 extension BHActivityThrobber {
-    private func startThrobbing() {
-        let throbberRect = throbberRects.objectAtIndex(0) as! UIImageView
-        let throbber1Rect = throbberRects.objectAtIndex(1) as! UIImageView
-        let throbber2Rect = throbberRects.objectAtIndex(2) as! UIImageView
+    private func startThrobbing(ind:Int) {
+        let curIndex = ind % 3
+        let prevIndex = (ind - 1) % 3
+        let curThrobber = throbberRects.objectAtIndex(curIndex) as! UIImageView
+        let prevThrobber = throbberRects.objectAtIndex(prevIndex) as! UIImageView
+        let grow = extendedFrames.objectAtIndex(curIndex).CGRectValue
+        let shrink = collapsedFrames.objectAtIndex(prevIndex).CGRectValue
         UIView.animateWithDuration(0.33, animations: { () -> Void in
-            throbberRect.frame = self.throbber0extendedFrame!
-            }) { (cont) -> Void in
-                UIView.animateWithDuration(0.33, animations: { () -> Void in
-                    throbberRect.frame = self.throbber0collapsedFrame!
-                    throbber1Rect.frame = self.throbber1extendedFrame!
-                    }, completion: { (cont) -> Void in
-                        UIView.animateWithDuration(0.33, animations: { () -> Void in
-                            throbber1Rect.frame = self.throbber1collapsedFrame!
-                            throbber2Rect.frame = self.throbber2extendedFrame!
-                            }, completion: { (cont) -> Void in
-                                self.stopAnimation()
-                        })
-                })
+            curThrobber.frame = grow
+            prevThrobber.frame = shrink
+            }) { (bool) -> Void in
+                self.startThrobbing(ind + 1)
         }
+        
     }
 }
