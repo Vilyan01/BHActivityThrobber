@@ -16,6 +16,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         throbber.parentVC = self.view
         throbber.fillColor = self.view.backgroundColor?.colorWithAlphaComponent(0.8)
+        throbber.setup()
         // Do any additional setup after loading the view, typically from a nib.
     }
 

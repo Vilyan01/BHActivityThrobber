@@ -27,17 +27,16 @@ class BHActivityThrobber: UIView {
     
     // Only override drawRect: if you perform custom drawing.
     // An empty implementation adversely affects performance during animation.
+    
     override func drawRect(rect: CGRect) {
         // Drawing code
         self.hidden = true
     }
     
-    func startAnimation() {
-        // blur things out
+    func setup() {
         let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
         blurView = UIVisualEffectView(effect: blurEffect)
         blurView.frame = parentVC!.frame
-        parentVC?.addSubview(blurView)
         // the throbber container
         let containerCenter = CGPoint(x: parentVC!.center.x - 25, y: parentVC!.center.y - 25)
         let containerFrame = CGRect(origin: containerCenter, size: CGSize(width: 50, height: 50))
@@ -81,7 +80,18 @@ class BHActivityThrobber: UIView {
         container?.addSubview(rect0)
         container?.addSubview(rect1)
         container?.addSubview(rect2)
+    }
+    
+    func startAnimation() {
+        parentVC?.addSubview(blurView)
         parentVC?.addSubview(container!)
+        var index = 0
+        for square in self.throbberRects {
+            let sq = square as! UIImageView
+            sq.frame = collapsedFrames.objectAtIndex(index).CGRectValue
+            container!.addSubview(sq)
+            index++
+        }
         startThrobbing(1)
         
     }
